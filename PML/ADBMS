@@ -1,0 +1,487 @@
+Assignment 1
+---------------------------------------------------------------------------------------------------------------------------------------
+ 
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+ 
+df = pd.read_csv('Heart.csv')
+print(df)
+> 
+df.shape # the number of rows and columns
+>
+df.head() #first 5 rows
+> 
+df.dtypes #the datatypes of columns
+> 
+df.isnull().sum() #counts the no of missing values in each rows or column in a dataframe
+> 
+(df==0).sum() #count number of zero value  in a dataframe
+> 
+df['Age'].mean() # mean of the age
+> 
+df.columns  #display the names of columns
+> 
+df.info  #gives overall info about the dataset
+> 
+from sklearn.model_selection import train_test_split
+ 
+hd = df[['Age','Sex','ChestPain','RestBP','Chol']]
+x=hd.drop('Chol', axis=1)
+y=hd['Chol']
+print(x)
+print(y)
+> 
+xtrain,xtest,ytrain,ytest=train_test_split(x,y,test_size=0.25) 
+xtrain.shape
+#here xtest ytest xtrain and y train are 4 tuples in numpy arrays
+#here xtrain and xtest stes of independent variables and
+#here ytarain and ytest are the sets of dependent variables
+> 
+ytest.shape
+> 
+df['Sex']=df['Sex'].replace([1], 'Male')
+df['Sex']=df['Sex'].replace([0], 'Female')
+print(df)
+> 
+dfl = df[df['AHD'].values == 'Yes']
+print(dfl)
+print(dfl.Age.max())
+print(dfl.Age.min())
+> 
+df.groupby('AHD').AHD.count().plot.bar(ylim=0)
+plt.plot()
+> 
+df.plot(kind='box',subplots=True,layout=(2,7),sharex=False, 
+figsize=(20,10),color='blue')
+> 
+df['Age'].hist(figsize=(10,13))
+plt.title('Age Histogram')
+>
+Text(0.5, 1.0, 'Age Histogram')
+ 
+df.hist(figsize=(12,15))
+plt.show()
+ 
+pd.crosstab(df.Age, df.AHD).plot(kind='bar',figsize=(12,15))
+plt.title('Barchart for Age V AHD')
+Text(0.5, 1.0, 'Barchart for Age V AHD'
+
+
+Assignment 2
+---------------------------------------------------------------------------------------------------------------------------------------
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from operator import mul
+import math
+def compute_regcoef(x,y):
+	n = len(x)
+ 	sumxy = sum(list(map(mul,x,y)))
+ 	num = n* sumxy - sum (x)*sum(y)
+ 	sumxx = sum(list(map(mul,x,x)))
+ 	denom = n*sumxx -sum(x)**2
+ 	m = num/denom
+ 	c =(sum(y)-m*sum(x))/n
+ 	return(c,m)
+def plot_regline(x,y,b):
+ 	plt.scatter(x,y,color='b',marker='o',s=80)
+ 	y_pred = np.float_(x)*b[1] + b[0]
+ 	plt.plot(x,y_pred,color='g')
+	plt.xlabel('X-variable')
+ 	plt.ylabel('Y-variable')
+ 	plt.show()
+x= [1,2,3,4,5,6,7,8,9]
+y= [1,2,3,4,5,6,7,8,9]
+b= compute_regcoef(x,y)
+type(b)
+print('intercept',b[0])
+print('slope',b[1])
+plot_regline(x,y,b)
+ 
+ 
+x= [1,2,3,4,5,6,7,8,9]
+y= [1,2,3,7,7,8,9,9,9]
+b= compute_regcoef(x,y)
+type(b)
+print('intercept',b[0])
+print('slope',b[1])
+plot_regline(x,y,b)
+ 
+ 
+df=pd.read_csv('weight-height.csv')
+print(df)
+ 
+df.columns
+ 
+df.dtypes
+ 
+x=df.iloc[:,1:2].values
+y=df.iloc[:,2].values
+b=compute_regcoef(x,y)
+type(b)
+print('intercept',b[0])
+print('slope',b[1])
+plot_regline(x,y,b)
+ 
+ 
+from sklearn.model_selection import train_test_split
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.25,rand
+om_state=0)
+from sklearn.linear_model import LinearRegression
+regression= LinearRegression()
+regression.fit(x_train,y_train)
+ 
+m=regression.coef_
+print('Regression Coefficient / slope of regression line',m)
+ 
+c= regression.intercept_
+print('Intercept',c)
+ 
+y_pred = regression.predict(x_test)
+print(y_pred)
+ 
+dfl = pd.DataFrame({'Actual value':y_test.flatten(),'Predicted
+Value':y_pred.flatten()})
+dfl
+ 
+x_test[0]*m+c
+ 
+plt.scatter(x_test, y_test)
+plt.plot(x_test,y_pred,color='r')
+plt.show()
+ 
+from sklearn import metrics
+print('Mean Absolute
+Error',metrics.mean_absolute_error(y_test,y_pred))
+print('Mean Squared Error',metrics.mean_squared_error(y_test,y_pred))
+print('Root Mean Squared
+Error',np.sqrt(metrics.mean_absolute_error(y_test,y_pred)))
+
+
+Assignment 3
+---------------------------------------------------------------------------------------------------------------------------------------
+import pandas as pd
+ 
+df=pd.read_csv('Admission_Predict.csv')
+ 
+df.columns
+ 
+df.columns=df.columns.str.rstrip()
+ 
+df.loc[df['Chance of Admit']>=0.80,'Chance of Admit']=1
+ 
+df.loc[df['Chance of Admit']<0.80,'Chance of Admit']=0
+ 
+df['Chance of Admit']
+ 
+df.columns
+ 
+df=df.drop('Serial No.',axis=1)
+ 
+df
+ 
+x=df.iloc[:,0:7]
+y=df.iloc[:,7]
+ 
+y
+ 
+from sklearn.model_selection import train_test_split
+ 
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.25,random_state=0)
+ 
+from sklearn.tree import DecisionTreeClassifier
+ 
+model=DecisionTreeClassifier(criterion="entropy",max_depth=4)
+model.fit(x_train,y_train)
+y_pred=model.predict(x_test)
+ 
+y_pred
+ 
+from sklearn.metrics import confusion_matrix
+ 
+matrix=confusion_matrix(y_test,y_pred,labels=[0.0,1,0])
+ 
+x_train.shape
+x_test.shape
+ 
+matrix
+ 
+from sklearn.metrics import accuracy_score
+ 
+acc=accuracy_score(y_test,y_pred)
+ 
+print(acc)
+ 
+from sklearn.metrics import classification_report
+cr=classification_report(y_test,y_pred)
+ 
+print(cr)
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Assignment 4
+----------------------------------------------------
+
+
+
+• Database
+> db.createCollection('student');
+{ "ok" : 1 }
+>db.student.insert({"rollNo":1,"name":"Shubham","Dept":"CM","Add":"Pune","Marks":76,"Co
+nNo":"9579522049"});
+WriteResult({ "nInserted" : 1 })
+> db.student.insert({"rollNo":2,"name":"Kartik","Dept":"IT","Add":"Mulshi","Marks":85});
+WriteResult({ "nInserted" : 1 })
+>db.student.insert({"rollNo":3,"name":"Rohan","Dept":"IT","Add":"Solapur","Marks":60,"Caste
+":"Open"});
+WriteResult({ "nInserted" : 1 })
+>db.student.insert({"rollNo":4,"name":"Pratik","Dept":"ME","Add":"Maval","Marks":45,"ConN
+o":"7744339890"});
+WriteResult({ "nInserted" : 1 })
+> db.student.insert({"rollNo":5,"name":"Kunal","Dept":"IT","Add":"Pune","M1":85,"M2":70});
+WriteResult({ "nInserted" : 1 })
+> 
+db.student.insert({"rollNo":6,"name":"Dnyanesh","Dept":"CE","Add":"Pune","M1":55,"M2":45
+});
+WriteResult({ "nInserted" : 1 })
+> 
+db.student.insert({"rollNo":7,"name":"Aditya","Dept":"AI","Add":"Kolhapur","M1":55,"M2":55
+});
+WriteResult({ "nInserted" : 1 })
+> db.student.find()
+{ "_id" : ObjectId("6363dbeec837a39bf20a80c1"), "rollNo" : 1, "name" : "Shubham", "Dept" : 
+"CM", "Add" : "Pune", "Marks" : 76, "ConNo" : "9579522049" }
+{ "_id" : ObjectId("6363dc3dc837a39bf20a80c2"), "rollNo" : 2, "name" : "Kartik", "Dept" : 
+"IT", "Add" : "Mulshi", "Marks" : 85 }
+{ "_id" : ObjectId("6363dc90c837a39bf20a80c3"), "rollNo" : 3, "name" : "Rohan", "Dept" : 
+"IT", "Add" : "Solapur", "Marks" : 60, "Caste" : "Open" }
+{ "_id" : ObjectId("6363dcdac837a39bf20a80c4"), "rollNo" : 4, "name" : "Pratik", "Dept" : 
+"ME", "Add" : "Maval", "Marks" : 45, "ConNo" : "7744339890" }
+{ "_id" : ObjectId("6363df78c5831339b82853f5"), "rollNo" : 5, "name" : "Kunal", "Dept" : "IT", 
+"Add" : "Pune", "M1" : 85, "M2" : 70 }
+{ "_id" : ObjectId("6363dfaec5831339b82853f6"), "rollNo" : 6, "name" : "Dnyanesh", "Dept" : 
+"CE", "Add" : "Pune", "M1" : 55, "M2" : 45 }
+{ "_id" : ObjectId("6363e039c5831339b82853f7"), "rollNo" : 7, "name" : "Aditya", "Dept" : 
+"AI", "Add" : "Kolhapur", "M1" : 55, "M2" : 55 }
+• $where Queries
+> db.student.find({"$where" : "function() { return this.M1 + this.M2 == 100; }"}).pretty()
+{
+ "_id" : ObjectId("6363dfaec5831339b82853f6"),
+ "rollNo" : 6,
+ "name" : "Dnyanesh",
+ "Dept" : "CE",
+ "Add" : "Pune",
+ "M1" : 55,
+ "M2" : 45
+}
+• Cursor
+> var mycursor1 = db.student.find({"Dept":"IT"}).pretty()
+> mycursor1
+{
+ "_id" : ObjectId("6363e5c2111a54acd7bd335c"),
+ "rollNo" : 2,
+ "name" : "Kartik",
+ "Dept" : "IT",
+ "Add" : "Mulshi",
+ "Marks" : 85
+}
+{
+ "_id" : ObjectId("6363e5d6111a54acd7bd335d"),
+ "rollNo" : 3,
+ "name" : "Rohan",
+ "Dept" : "IT",
+ "Add" : "Solapur",
+ "Marks" : 60,
+ "Caste" : "Open"
+}
+{
+ "_id" : ObjectId("6363e5e9111a54acd7bd335f"),
+ "rollNo" : 5,
+ "name" : "Kunal",
+ "Dept" : "IT",
+ "Add" : "Pune",
+ "M1" : 85,
+ "M2" : 70
+}
+{
+ "_id" : ObjectId("6363df78c5831339b82853f5"),
+ "rollNo" : 5,
+ "name" : "Kunal",
+ "Dept" : "IT",
+ "Add" : "Pune",
+ "M1" : 85,
+ "M2" : 70
+}
+• Limit, Skips, Sorts
+> db.student.find().limit(3);
+{ "_id" : ObjectId("6363e598111a54acd7bd335b"), "rollNo" : 1, "name" : "Shubham", "Dept" : 
+"CM", "Add" : "Pune", "Marks" : 76, "ConNo" : "9579522049" }
+{ "_id" : ObjectId("6363e5c2111a54acd7bd335c"), "rollNo" : 2, "name" : "Kartik", "Dept" : 
+"IT", "Add" : "Mulshi", "Marks" : 85 }
+{ "_id" : ObjectId("6363e5d6111a54acd7bd335d"), "rollNo" : 3, "name" : "Rohan", "Dept" : 
+"IT", "Add" : "Solapur", "Marks" : 60, "Caste" : "Open" }
+> db.student.find().skip(3);
+{ "_id" : ObjectId("6363e5df111a54acd7bd335e"), "rollNo" : 4, "name" : "Pratik", "Dept" : 
+"ME", "Add" : "Maval", "Marks" : 45, "ConNo" : "7744339890" }
+{ "_id" : ObjectId("6363e5e9111a54acd7bd335f"), "rollNo" : 5, "name" : "Kunal", "Dept" : "IT", 
+"Add" : "Pune", "M1" : 85, "M2" : 70 }
+{ "_id" : ObjectId("6363e5f2111a54acd7bd3360"), "rollNo" : 6, "name" : "Dnyanesh", "Dept" : 
+"CE", "Add" : "Pune", "M1" : 55, "M2" : 45 }
+{ "_id" : ObjectId("6363e5fc111a54acd7bd3361"), "rollNo" : 7, "name" : "Aditya", "Dept" : 
+"AI", "Add" : "Kolhapur", "M1" : 55, "M2" : 55 }
+> db.student.find().sort({"rollNo":-1});
+{ "_id" : ObjectId("6363e5fc111a54acd7bd3361"), "rollNo" : 7, "name" : "Aditya", "Dept" : 
+"AI", "Add" : "Kolhapur", "M1" : 55, "M2" : 55 }
+{ "_id" : ObjectId("6363e5f2111a54acd7bd3360"), "rollNo" : 6, "name" : "Dnyanesh", "Dept" : 
+"CE", "Add" : "Pune", "M1" : 55, "M2" : 45 }
+{ "_id" : ObjectId("6363e5e9111a54acd7bd335f"), "rollNo" : 5, "name" : "Kunal", "Dept" : "IT", 
+"Add" : "Pune", "M1" : 85, "M2" : 70 }
+{ "_id" : ObjectId("6363e5df111a54acd7bd335e"), "rollNo" : 4, "name" : "Pratik", "Dept" : 
+"ME", "Add" : "Maval", "Marks" : 45, "ConNo" : "7744339890" }
+{ "_id" : ObjectId("6363e5d6111a54acd7bd335d"), "rollNo" : 3, "name" : "Rohan", "Dept" : 
+"IT", "Add" : "Solapur", "Marks" : 60, "Caste" : "Open" }
+{ "_id" : ObjectId("6363e5c2111a54acd7bd335c"), "rollNo" : 2, "name" : "Kartik", "Dept" : 
+"IT", "Add" : "Mulshi", "Marks" : 85 }
+{ "_id" : ObjectId("6363e598111a54acd7bd335b"), "rollNo" : 1, "name" : "Shubham", "Dept" : 
+"CM", "Add" : "Pune", "Marks" : 76, "ConNo" : "9579522049" }
+Database:
+> db.createCollection('stud');
+{ "ok" : 1 }
+> db.stud.insert({"id":1, "sec":"A", "marks":80});
+WriteResult({ "nInserted" : 1 })
+> db.stud.insert({"id":2, "sec":"A", "marks":90});
+WriteResult({ "nInserted" : 1 })
+> db.stud.insert({"id":3, "sec":"B", "marks":99});
+WriteResult({ "nInserted" : 1 })
+> db.stud.insert({"id":1, "sec":"B", "marks":95});
+WriteResult({ "nInserted" : 1 })
+> db.stud.insert({"id":1, "sec":"C", "marks":90});
+WriteResult({ "nInserted" : 1 })
+> db.stud.find();
+{ "_id" : ObjectId("6363f63be94c42f195d1cdff"), "id" : 1, "sec" : "A", "marks" : 80 }
+{ "_id" : ObjectId("6363f64ce94c42f195d1ce00"), "id" : 2, "sec" : "A", "marks" : 90 }
+{ "_id" : ObjectId("6363f668e94c42f195d1ce01"), "id" : 3, "sec" : "B", "marks" : 99 }
+{ "_id" : ObjectId("6363f67fe94c42f195d1ce02"), "id" : 1, "sec" : "B", "marks" : 95 }
+{ "_id" : ObjectId("6363f690e94c42f195d1ce03"), "id" : 1, "sec" : "C", "marks" : 90 }
+• Map-reduce
+> var map=function(){ emit(this.sec,this.marks)};
+> var reduce=function(sec,marks){ return Array.sum(marks);};
+> db.stud.mapReduce(map,reduce,{out :"resultCollection2"});
+{ "result" : "resultCollection2", "ok" : 1 }
+> db.resultCollection2.find()
+{ "_id" : "B", "value" : 194 }
+{ "_id" : "A", "value" : 170 }
+{ "_id" : "C", "value" : 90 }
+• Indexing
+> db.stud.createIndex({marks:1})
+{
+ "createdCollectionAutomatically" : false,
+ "numIndexesBefore" : 1,
+ "numIndexesAfter" : 2,
+ "ok" : 1
+}
+> db.stud.getIndexes()
+[
+ {
+ "v" : 2,
+ "key" : {
+ "_id" : 1
+ },
+ "name" : "_id_"
+ },
+ {
+ "v" : 2,
+ "key" : {
+ "marks" : 1
+ },
+ "name" : "marks_1"
+ }
+]
+• Aggregation
+> db.stud.aggregate([{$group : {_id: "$sec", TotalRecords: {$sum : 1}}}])
+{ "_id" : "C", "TotalRecords" : 1 }
+{ "_id" : "A", "TotalRecords" : 2 }
+{ "_id" : "B", "TotalRecords" : 2 }
+> db.createCollection("teacher")
+{ "ok" : 1 }
+> db.teacher.insert({t_id:1, name:"Kamlesh Amin",dept:"Comp",sal:15000,status:"A"})
+WriteResult({ "nInserted" : 1 })
+> db.teacher.insert({t_id:2, name:"Rajesh",dept:"IT",sal:25000,status:"A"})
+WriteResult({ "nInserted" : 1 })
+> db.teacher.insert({t_id:3, name:"Ravi",dept:"IT",sal:20000,status:"A"})
+WriteResult({ "nInserted" : 1 })
+> db.teacher.insert({t_id:4, name:"Kavitai",dept:"IT",sal:120000,status:"N"})
+WriteResult({ "nInserted" : 1 })
+> db.teacher.insert({t_id:5, name:"Kavya",dept:"Comp",sal:40000,status:"A"})
+WriteResult({ "nInserted" : 1 })
+> db.teacher.insert({t_id:5, name:"Ronit",dept:"Comp",sal:45000,status:"N"})
+WriteResult({ "nInserted" : 1 })
+>
+> db.teacher.find()
+{ "_id" : ObjectId("544144c5534f731837e302ee"), "t_id" : 1, "name" : "Kamlesh Amin", "dept
+" : "Comp", "sal" : 15000, "status" : "A" }
+{ "_id" : ObjectId("54414585534f731837e302ef"), "t_id" : 2, "name" : "Rajesh", "dept" : "I
+T", "sal" : 25000, "status" : "A" }
+{ "_id" : ObjectId("544145c0534f731837e302f2"), "t_id" : 3, "name" : "Ravi", "dept" : "IT"
+, "sal" : 20000, "status" : "A" }
+{ "_id" : ObjectId("544145c6534f731837e302f3"), "t_id" : 4, "name" : "Kavitai", "dept" : "
+IT", "sal" : 120000, "status" : "N" }
+{ "_id" : ObjectId("54414666534f731837e302f4"), "t_id" : 5, "name" : "Kavya", "dept" : "Co
+mp", "sal" : 40000, "status" : "A" }
+{ "_id" : ObjectId("54414675534f731837e302f5"), "t_id" : 6, "name" : "Ronit", "dept" : "Co
+mp", "sal" : 45000, "status" : "N" }
+• Indexing
+> db.teacher.ensureIndex({t_id:2});
+{
+ "createdCollectionAutomatically" : false,
+ "numIndexesBefore" : 1,
+ "numIndexesAfter" : 2,
+ "ok" : 1
+}
+• Aggrigation
+> db.teacher.aggregate({$group:{_id:"$status",sum:{$sum:"$sal"}}})
+{ "_id" : "N", "sum" : 165000 }
+{ "_id" : "A", "sum" : 100000 }
+> 
+db.teacher.aggregate({$group:{_id:"$status",sum:{$sum:"$sal"}}},{$match:{sum:{$gte:150000
+}}})
+{ "_id" : "N", "sum" : 165000 }
+Map-reduce:
+> use king
+switched to db king
+> db.createCollection("pop");
+{ "ok" : 1 }
+> db.pop.insert({city:"pune",population:200000});
+WriteResult({ "nInserted" : 1 })
+> db.pop.insert({city:"mumbai",population:800000});
+WriteResult({ "nInserted" : 1 })
+> db.pop.insert({city:"udaipur",population:90000});
+WriteResult({ "nInserted" : 1 })
+> db.pop.insert({city:"nagpur",population:100000});
+WriteResult({ "nInserted" : 1 })
+> db.pop.insert({city:"jaipur",population:900000});
+WriteResult({ "nInserted" : 1 })
+> db.pop.find();
+{ "_id" : ObjectId("59dae80647d0a1fc6be713cc"), "city" : "pune", "population" : 200000 }
+{ "_id" : ObjectId("59dae80f47d0a1fc6be713cd"), "city" : "mumbai", "population" : 800000 }
+{ "_id" : ObjectId("59dae81847d0a1fc6be713ce"), "city" : "udaipur", "population" : 90000 }
+{ "_id" : ObjectId("59dae84647d0a1fc6be713cf"), "city" : "nagpur", "population" : 100000 }
+{ "_id" : ObjectId("59dae85547d0a1fc6be713d0"), "city" : "jaipur", "population" : 900000 }
+> var mapfunc=function() {emit(null,this.population);};
+> var reducefunc=function(country,population) {return Array.sum(population);};
+> db.pop.mapReduce(mapfunc,reducefunc,{out:"total"});
+{
+"result" : "total",
+"timeMillis" : 457,
+"counts" : {
+"input" : 5,
+"emit" : 5,
+"reduce" : 1,
+"output" : 1
+},
+"ok" : 1
+}
+> db.total.find();
+{ "_id" : null, "value" : 2090000 }
+>
