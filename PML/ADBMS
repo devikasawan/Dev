@@ -68,6 +68,63 @@ pd.crosstab(df.Age, df.AHD).plot(kind='bar',figsize=(12,15))
 plt.title('Barchart for Age V AHD')
 Text(0.5, 1.0, 'Barchart for Age V AHD'
 
+BONUS == in python, there is a package named 'pandas' through which we can perform structured data analysis, meaning data which is stored in structured/tabular/excelcsv file, uspe analytical processing karne ke liye 'pandas' package ka use karte hai.
+
+1. for looking at the first 5 entries: data.head() OR df.head() -- depends on what your variable name is('data' or 'df').
+basically, [1.] is used to look at the snapshot of data
+
+2. For finding shape of data: data.shape -- considering my variable name is 'data'
+in exp1 -- 'data.shape' gives output (303,15) meaning there are 303 rows and 15 columns in this dataset[Heart.csv]
+
+3. For finding Missing values: data.isnull() -- method name: isnull()
+meaning: at every columns in few places, data entry operator hasn't filled any data there, is known as missing values
+OUPUT mai jaha jaha 'True' dikhega vaha null values rahenge
+but we won't get exact info through it [we need a summary of that]
+so use, data.isnull().sum()
+
+NOW, to find notnull values use method -- data.count()
+
+4. For finding data types of each column: data.dtypes -- dtypes is a attribute, not a method
+WHERE, object --'string' value ; int64 -- '64 bit integer' ; float64 -- '64 bit float'
+
+5. For finding out Zero's: data==0
+jaha 'True' ayega udhar Zero value rahega
+BUT, if you want to specially highlight that then use: data[data==0]
+AND, to exactly count how many Zero's then: data[data==0].count()
+
+BONUS -- To know the name of columns: data.columns
+columns is a attribute, not a method
+
+6. To find mean of given column('Age): data['Age'].mean() -- mean() is a method
+NOW, BEFORE 6TH POINT, to access a given column, use data['Age']
+
+7. To extract particular no. of columns('Age','Sex','ChestPain','RestBP','Chol'): 
+data[['Age','Sex','ChestPain','RestBP','Chol']]
+NOW, SUPPOSE we store it in a new varible(let say 'newdata') then: 
+newdata=data[['Age','Sex','ChestPain','RestBP','Chol']] 
+newdata
+-- also known as label based slicing
+
+8. train-test split: KNOWN AS 'cross validation'
+here we split our data in traning and testing set
+-- i.e., when ML Model is being trained, that time it is(will be) given 75% data, by which ML model is created AND testing data is kept aside; after creation of ML model, testing data is given as a input to the ML algorithm, AND whether or NOT it's results are matching, we check.
+-- Through this we also get to know the accuracy of this algorithm.
+
+9. so uske liye ka jo function hai, use: 
+from sklearn.model_selection import train_test_split
+in 'sklearn' named library there's a subpackage named 'model_selection', in which you will get a 'train_test_split' named method
+-- so we import 'train_test_split from that, and split data between train and test.
+
+10. Confusion Matrix:
+when we want to create/make an array, we make use of 'numpy' package, in which there are methods named as 'zeros' and 'ones' -- import numpy as np
+NOW, from the ques., taking actual=45 and predicted=50
+so, creating 'actual[variable]' array: actual=list(np.ones(45))+list(np.zeroz(55))
+and, creating 'predicted[variable]' array: actual=list(np.ones(50))+list(np.zeroz(50))
+SO, from the above output of both, 1 ko 1 match karne wale kitne, 0 ko 0 mathc karne wale kitne, 1 actual ko 0 predicted kitne, and 0 actual ko 1 predicted wale kitne calculation ko 'Confusion Matrix' use karte hai.
+
+11. Now, how to show 'Confusion Matrix': from sklearn.metrics import ConfusionMatrixDisplay -- 'Confus....Display' is a class
+AND: ConfusionMatrixDisplay.from_predictions(actual,predicted) -- 'from_predictions' is a method in 'Conf...Display' jisko pehle actual value pass karo and then predicted value
+
 
 Assignment 2
 ---------------------------------------------------------------------------------------------------------------------------------------
@@ -160,6 +217,40 @@ print('Mean Squared Error',metrics.mean_squared_error(y_test,y_pred))
 print('Root Mean Squared
 Error',np.sqrt(metrics.mean_absolute_error(y_test,y_pred)))
 
+import matplotlib.pyplot as plt -- 'matplotlib' is used for visualisation
+import seaborn as sns -- can do regression of 'visualisation' in the best way possible.
+
+Linear regression equation: y=mx+c
+WHERE, 'y' is dependant variable, considering 'annual temperature'; 'x' is indenpendant('input variable') variable, considering it as 'year'
+
+BONUS -- if we use simple data, we can show that 'x' and 'y' are linearly connected.
+
+For increasing size of the plot we are creating use: plt.figure(figsize=(16,9)) -- (16,9) or 16 by 9 is the aspect ratio, meaning pure screen pe ye plot ayega.
+
+FROM the first graph(scattered), jaise year bad raha hai, temp bhi bad raha hai.
+
+in the graph, at top-left corner, there are 2 dots, meaning voh saal global warming hua(can say); voh dots ko hum 'outliers' kehte hai in ML. When such outliers are created, accuracy kam ho jati hai.
+
+x.shape -- 'output'=(117,)
+HERE, only no. of rows is given; and it is important to have both rows and columns while creating a ML model
+so, for that(as 'x' is a series object) use array mai convert karna hoga.
+SO, using method 'values': x=x.values
+BONUS -- converted into array so that we can reshape it, meaning we can now give it columns too.
+THIS IS A PYTHON LIBRARY REQUIREMENT, not a ML requirement.
+
+When to train algo use: regressor.fit(x,y) 
+jise hum do paramaters pass karne padte hai, 'x'=input, 'y'=output
+
+regressor.coef_
+-- known as slope/coefficient, i.e., y=mx+x mai se 'm' ki value
+regressor.intecept_
+-- known as 'c' ki value
+These two are called are model parameters
+Jo parameter ML provide karta hai are known as 'model para...' and jab hum use pass karte hai then its called 'hyper parameters'
+
+R-square score OR r2 score is used for calculating performance measure.
+meaning linearity kitni hai voh measure karne liye
+
 
 Assignment 3
 ---------------------------------------------------------------------------------------------------------------------------------------
@@ -219,6 +310,12 @@ from sklearn.metrics import classification_report
 cr=classification_report(y_test,y_pred)
  
 print(cr)
+HERE, 'Chance of Admit' is dependant variable -- output variable
+
+to change paramater of data use: astype
+i.e., -- y=y.astype('int')
+
+
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Assignment 4
 ----------------------------------------------------
